@@ -6,7 +6,7 @@ if ((window.DeviceOrientationEvent) && ('ontouchstart' in window)) {
 
 //PCなど非ジャイロ
 if (!isGyro) {
-    setCanvas();
+    gyroIsNotAllowed();
 
     //一応ジャイロ持ちデバイス
 } else {
@@ -22,7 +22,7 @@ if (!isGyro) {
     setTimeout(function () {
         //ジャイロが動いた
         if (resGyro) {
-            setCanvas();
+            gyroIsNotAllowed();
 
             //ジャイロ持ってるくせに動かなかった
         } else {
@@ -35,11 +35,11 @@ if (!isGyro) {
                     DeviceOrientationEvent.requestPermission().then(res => {
                         //「動作と方向」が許可された
                         if (res === "granted") {
-                            setCanvas();
+                            gyroIsNotAllowed();
                             //「動作と方向」が許可されなかった
                         } else {
                             isGyro = false;
-                            setCanvas();
+                            gyroIsNotAllowed();
                         }
                     });
                 });
@@ -48,9 +48,13 @@ if (!isGyro) {
             } else {
                 //早くアップデートしてもらうのを祈りながら諦める
                 isGyro = false;
-                setCanvas();
+                gyroIsNotAllowed();
             }
         }
     }, 300);
 }
 
+
+function gyroIsNotAllowed() {
+    console.log("ジャイロセンサーが利用できません");
+}
