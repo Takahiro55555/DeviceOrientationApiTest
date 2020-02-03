@@ -54,7 +54,16 @@ if (!isGyro) {
     }, 300);
 }
 
+function gyroIsAllowed() {
+    msg = "[OK]ジャイロセンサーが利用可能になりました";
+    const msgTag = document.getElementById("msg");
+    msgTag.innerText = msg;
+    console.log(msg);
+}
 
 function gyroIsNotAllowed() {
-    console.log("ジャイロセンサーが利用できません");
+    msg = "[ERROR]ジャイロセンサーが利用できません";
+    const msgTag = document.getElementById("msg");
+    msgTag.innerText = msg;
+    console.log(msg);
 }
