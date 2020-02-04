@@ -46,7 +46,7 @@ if (!isGyro) {
             if (typeof DeviceOrientationEvent.requestPermission === "function") {
                 //ユーザアクションを得るための要素を表示
                 appendMessage("[Log] iOS13+方式です");
-                const body = document.getElementById("title");
+                const body = document.getElementById("body");
                 body.onclick = function () {
                     appendMessage("[Log]クリックされました");
                     DeviceOrientationEvent.requestPermission().then(res => {
