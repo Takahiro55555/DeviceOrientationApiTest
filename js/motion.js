@@ -1,7 +1,7 @@
 //URL: https://tknc.jp/tp_detail.php?id=1116
 
 //ジャイロセンサー確認
-const ws = new WebSocket("ws://127.0.0.1:8080/websocket");  // ローカルにデータを飛ばせるかどうかの確認
+const ws = new WebSocket("ws://10.0.0.2:8080/websocket");  // ローカルにデータを飛ばせるかどうかの確認
 var isGyro = false;
 if ((window.DeviceOrientationEvent) && ('ontouchstart' in window)) {
     isGyro = true;
