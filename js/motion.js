@@ -2,13 +2,13 @@
 var isGyro = false;
 if ((window.DeviceOrientationEvent) && ('ontouchstart' in window)) {
     isGyro = true;
-    appendMessage("[Log] ジャイロセンサーを搭載しています");
+    logPrintln("ジャイロセンサーを搭載しています");
 }
 
 //PCなど非ジャイロ
 if (!isGyro) {
     // ここに何か関数
-    appendMessage("[Log] ジャイロセンサーを搭載していません");
+    errorPrintln("ジャイロセンサーを搭載していません");
     //一応ジャイロ持ちデバイス
 } else {
     //ジャイロ動作確認
@@ -25,8 +25,8 @@ if (!isGyro) {
             alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
             beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
             gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
-            msg = "[Data] a: " + alpha + ", b: " + beta + ", g: " + gamma;
-            appendMessage(msg);
+            msg = "a: " + alpha + ", b: " + beta + ", g: " + gamma;
+            logPrintln(msg);
         });
     }
 
@@ -43,23 +43,23 @@ if (!isGyro) {
             //iOS13+方式ならクリックイベントを要求
             if (typeof DeviceOrientationEvent.requestPermission === "function") {
                 //ユーザアクションを得るための要素を表示
-                appendMessage("[Log] iOS13+方式です");
+                logPrintln("iOS13+方式です");
                 const body = document.getElementById("body");
                 body.onclick = function () {
-                    appendMessage("[Log]クリックされました");
+                    logPrintln("クリックされました");
                     DeviceOrientationEvent.requestPermission().then(res => {
-                        appendMessage("[Log] 許可を確認ダイアログが出現するはずです...");
+                        logPrintln("許可を確認ダイアログが出現するはずです...");
                         //「動作と方向」が許可された
                         if (res === "granted") {
                             // ここに何か関数
                             gyroIsAllowed();
-                            appendMessage("[Log] 動作と方向が許可されました");
+                            logPrintln("動作と方向が許可されました");
                             //「動作と方向」が許可されなかった
                         } else {
                             isGyro = false;
                             // ここに何か関数
                             gyroIsNotAllowed();
-                            appendMessage("[Log] 動作と方向が許可されませんでした");
+                            logPrintln("動作と方向が許可されませんでした");
                         }
                     });
                 };
@@ -69,7 +69,7 @@ if (!isGyro) {
                 //早くアップデートしてもらうのを祈りながら諦める
                 isGyro = false;
                 // ここに何か関数
-                appendMessage("[Log] 早くアップデートしてもらうのを祈りながら諦める");
+                logPrintln("早くアップデートしてもらうのを祈りながら諦める");
             }
             gyroIsNotAllowed();
         }
@@ -78,18 +78,45 @@ if (!isGyro) {
 
 function gyroIsAllowed() {
     msg = "[OK]ジャイロセンサーを利用することが可能になりました";
-    appendMessage(msg);
+    logPrintln(msg);
 }
 
 function gyroIsNotAllowed() {
-    msg = "[ERROR]ジャイロセンサーを利用できません";
-    appendMessage(msg);
+    msg = "ジャイロセンサーを利用できません";
+    errorPrintln(msg);
 }
 
-function appendMessage(msg) {
-    const msgTag = document.getElementById("msg");
-    const newMsgElement = document.createElement("div");
-    newMsgElement.textContent = msg;
-    msgTag.insertBefore(newMsgElement, msgTag.firstChild);
+/**
+ * エラーメッセージをhtmlのコンソールエレメントの先頭（1行目）に表示する
+ * "error"クラスを適用
+ * @param {表示したいメッセージ} msg 
+ */
+function errorPrintln(msg) {
+    const newLogElement = document.createElement("div");
+    newLogElement.textContent = "[Error] " + msg;
+    newLogElement.className = "error";
+    htmlConsolePrintln(newLogElement);
     console.log(msg);
+}
+
+/**
+ * ログメッセージをhtmlのコンソールエレメントの先頭（1行目）に表示する
+ * "log"クラスを適用
+ * @param {表示したいメッセージ} msg 
+ */
+function logPrintln(msg) {
+    const newLogElement = document.createElement("div");
+    newLogElement.textContent = "[Log] " + msg;
+    newLogElement.className = "log";
+    htmlConsolePrintln(newLogElement);
+    console.log(msg);
+}
+
+/**
+ * htmlのコンソールエレメントの先頭（1行目）に当該エレメントを追記する
+ * @param {htmlのエレメント} element 
+ */
+function htmlConsolePrintln(element) {
+    const consoleElement = document.getElementById("console");
+    consoleElement.insertBefore(element, consoleElement.firstChild);
 }
