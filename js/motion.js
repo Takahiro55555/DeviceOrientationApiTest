@@ -1,5 +1,5 @@
 //参考URL: https://tknc.jp/tp_detail.php?id=1116
-var isGyro = false;
+let isGyro = false;
 if ((window.DeviceOrientationEvent) && ('ontouchstart' in window)) {
     isGyro = true;
     logPrintln("ジャイロセンサーを搭載しています");
