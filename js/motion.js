@@ -24,15 +24,14 @@ if (!isGyro) {
         //参考URL: https://kkblab.com/make/javascript/gyro.html
         // ジャイロセンサの値が変化したら実行される deviceorientation イベント
         window.addEventListener("deviceorientation", (dat) => {
-            if (performance.now() - gyroBeforeUpdate > gyroUpdateIntervalSec) {
-                return;
+            if (performance.now() - gyroBeforeUpdate > gyroUpdateIntervalSec * 1000) {
+                gyroBeforeUpdate = performance.now();
+                alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
+                beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
+                gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
+                msg = "a: " + alpha + ", b: " + beta + ", g: " + gamma;
+                logPrintln(msg);
             }
-            gyroBeforeUpdate = performance.now();
-            alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
-            beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
-            gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
-            msg = "a: " + alpha + ", b: " + beta + ", g: " + gamma;
-            logPrintln(msg);
         });
     }
 
