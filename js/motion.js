@@ -24,7 +24,7 @@ if (!isGyro) {
         //参考URL: https://kkblab.com/make/javascript/gyro.html
         // ジャイロセンサの値が変化したら実行される deviceorientation イベント
         window.addEventListener("deviceorientation", (dat) => {
-            if (performance.now() - gyroBeforeUpdate < gyroUpdateIntervalSec) {
+            if (performance.now() - gyroBeforeUpdate > gyroUpdateIntervalSec) {
                 return;
             }
             gyroBeforeUpdate = performance.now();
