@@ -12,7 +12,7 @@ if (!isGyro) {
     //一応ジャイロ持ちデバイス
 } else {
     //ジャイロ動作確認
-    var resGyro = false;
+    let resGyro = false;
     window.addEventListener("deviceorientation", doGyro, false);
     function doGyro() {
         resGyro = true;
