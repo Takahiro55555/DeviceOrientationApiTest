@@ -1,7 +1,4 @@
-//URL: https://tknc.jp/tp_detail.php?id=1116
-
-//ジャイロセンサー確認
-const ws = new WebSocket("ws://10.0.0.2:8080/websocket");  // ローカルにデータを飛ばせるかどうかの確認
+//参考URL: https://tknc.jp/tp_detail.php?id=1116
 var isGyro = false;
 if ((window.DeviceOrientationEvent) && ('ontouchstart' in window)) {
     isGyro = true;
@@ -22,7 +19,7 @@ if (!isGyro) {
         window.removeEventListener("deviceorientation", doGyro, false);
         gyroIsAllowed();
 
-        //URL: https://kkblab.com/make/javascript/gyro.html
+        //参考URL: https://kkblab.com/make/javascript/gyro.html
         // ジャイロセンサの値が変化したら実行される deviceorientation イベント
         window.addEventListener("deviceorientation", (dat) => {
             alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
@@ -95,5 +92,4 @@ function appendMessage(msg) {
     newMsgElement.textContent = msg;
     msgTag.insertBefore(newMsgElement, msgTag.firstChild);
     console.log(msg);
-    ws.send(msg);
 }
