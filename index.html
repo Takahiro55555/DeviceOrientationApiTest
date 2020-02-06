@@ -6,12 +6,40 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>DeviceOrientationApiTest</title>
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
-<body id="body">
-  <h1>DeviceOrientationApiTest</h1>
-  <div id="console"></div>
-  <script src="js/motion.js?p=(new Date()).getTime()"></script>
+<body id="body" class="container">
+  <div class="row">
+    <div class="col-12 mt-3">
+      <h1>TestPage</h1>
+    </div>
+    <div class="col-12 mt-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="cart-title">WebSocket 接続設定</h5>
+
+          <select name="protocol" id="protocol" class="mb-3">
+            <option value="ws://" selected>ws://</option>
+            <option value="wss://">wss://</option>
+          </select>
+          <input type="text" id="websocket-url" class="mb-3" value="127.0.0.1/websocket">
+          <button id="connect" class="btn btn-primary btn-block mt-4">接続</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="cart-title">Console</h5>
+          <div id="console" class="console"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
+<script src="js/motion.js?p=(new Date()).getTime()"></script>
 
 </html>
