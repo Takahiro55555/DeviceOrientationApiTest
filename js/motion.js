@@ -2,6 +2,40 @@
 let isGyro = false;
 const gyroUpdateIntervalSec = 1;
 let gyroBeforeUpdate = 0;
+let isAvailableWebsocket = false;
+let ws;
+
+document.getElementById('connect').addEventListener('click', function () {
+    let wsProtocol = document.getElementById('scheme').value;
+    let wsPath = document.getElementById('path').value;  //NOTE: URLからスキーマを除いた部分の名称が分からなかった
+
+    if (wsPath == '') {
+        wsPath = document.getElementById('path').placeholder;
+    }
+    wsUrl = wsProtocol + wsPath;
+
+    if (isAvailableWebsocket) {
+        ws.send("Bye");
+        ws.close();
+        logPrintln("[WebSocket] 接続終了");
+    }
+
+    logPrintln("[WebSocket] Connecting to: " + wsUrl);
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = function (e) {
+        logPrintln("[WebSocket] 接続に成功しました");
+        isAvailableWebsocket = true;
+        ws.send("Hello");
+    }
+
+    ws.onerror = function (error) {
+        errorPrintln("[WebSocker] エラーが発生しました");
+        isAvailableWebsocket = false;
+    }
+})
+
+
 if ((window.DeviceOrientationEvent) && ('ontouchstart' in window)) {
     isGyro = true;
     logPrintln("ジャイロセンサーを搭載しています");
@@ -24,13 +58,17 @@ if (!isGyro) {
         //参考URL: https://kkblab.com/make/javascript/gyro.html
         // ジャイロセンサの値が変化したら実行される deviceorientation イベント
         window.addEventListener("deviceorientation", (dat) => {
-            if (performance.now() - gyroBeforeUpdate > gyroUpdateIntervalSec * 1000) {
-                gyroBeforeUpdate = performance.now();
-                alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
-                beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
-                gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
-                msg = "a: " + alpha + ", b: " + beta + ", g: " + gamma;
-                logPrintln(msg);
+            if (performance.now() - gyroBeforeUpdate < gyroUpdateIntervalSec * 1000) {
+                return;
+            }
+            gyroBeforeUpdate = performance.now();
+            alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
+            beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
+            gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
+            msg = "a: " + alpha + ", b: " + beta + ", g: " + gamma;
+            logPrintln(msg);
+            if (isAvailableWebsocket) {
+                ws.send(msg);
             }
         });
     }
