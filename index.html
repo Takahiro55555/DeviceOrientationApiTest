@@ -20,11 +20,12 @@
         <div class="card-body">
           <h5 class="cart-title">WebSocket 接続設定</h5>
 
-          <select name="protocol" id="protocol" class="mb-3">
+          <select name="scheme" id="scheme" class="mb-3">
             <option value="ws://" selected>ws://</option>
             <option value="wss://">wss://</option>
           </select>
-          <input type="text" id="websocket-url" class="mb-3" value="127.0.0.1/websocket">
+          <!-- URLのスキームを除いた部分全体を表す名称が分からなかった... -->
+          <input type="text" id="path" class="mb-3" value="127.0.0.1/websocket">
           <button id="connect" class="btn btn-primary btn-block mt-4">接続</button>
         </div>
       </div>
