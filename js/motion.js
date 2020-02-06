@@ -21,7 +21,11 @@ document.getElementById('connect').addEventListener('click', function () {
     }
 
     logPrintln("[WebSocket] Connecting to: " + wsUrl);
-    ws = new WebSocket(wsUrl);
+    try {
+        ws = new WebSocket(wsUrl);
+    } catch (e) {
+        errorPrintln("[WebSocker] 接続に失敗しました");
+    }
 
     ws.onopen = function (e) {
         logPrintln("[WebSocket] 接続に成功しました");
