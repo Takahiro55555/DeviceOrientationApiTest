@@ -8,7 +8,7 @@ let wsUrl = null;
 let relayIdPublic = null;
 
 if( getParam('protocol') != null && getParam('relayId') != null) {
-    wsUrl = getParam('protocol') + '://controller.moyashi.dev//ws/v1/relays/' + getParam('relayId');
+    wsUrl = getParam('protocol') + '://controller.moyashi.dev/ws/v1/relays/' + getParam('relayId');
     relayIdPublic = getParam('relayId').match(/^[0-9a-zA-Z]+/)[0];
     document.getElementById('ws-url').innerText = wsUrl;
 }else{
