@@ -18,22 +18,16 @@
     <div class="col-12 mt-3">
       <div class="card">
         <div class="card-body">
-          <h5 class="cart-title">WebSocket 接続設定</h5>
-
-          <select name="scheme" id="scheme" class="mb-3">
-            <option value="ws://" selected>ws://</option>
-            <option value="wss://">wss://</option>
-          </select>
-          <!-- URLのスキームを除いた部分全体を表す名称が分からなかった... -->
-          <input type="text" id="path" class="mb-3" placeholder="127.0.0.1:8080/websocket">
+          <h5 class="cart-title">WebSocket 接続先</h5>
+          <div id="ws-url"></div>
           <button id="connect" class="btn btn-primary btn-block mt-4">接続</button>
         </div>
       </div>
     </div>
 
-    <div class="col-12 mt-3">
-      <div class="card">
-        <div class="card-body">
+    <div class="col-12 mt-3" style="height: 20rem;">
+      <div class="card" style="height: 100%;">
+        <div class="card-body" style="height: 100%;">
           <h5 class="cart-title">Console</h5>
           <div id="console" class="console"></div>
         </div>

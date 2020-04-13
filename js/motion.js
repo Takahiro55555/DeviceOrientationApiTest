@@ -4,20 +4,41 @@ const gyroUpdateIntervalSec = 1;
 let gyroBeforeUpdate = 0;
 let isAvailableWebsocket = false;
 let ws;
+let wsUrl = null;
+let relayIdPublic = null;
+
+if( getParam('protocol') != null && getParam('relayId') != null) {
+    wsUrl = getParam('protocol') + '://controller.moyashi.dev//ws/v1/relays/' + getParam('relayId');
+    relayIdPublic = getParam('relayId').match(/^[0-9a-zA-Z]+/)[0];
+    document.getElementById('ws-url').innerText = wsUrl;
+}else{
+    document.getElementById('ws-url').innerText = 'Invalid URL Parameter!!!';
+}
+
+if ( localStorage.getItem(relayIdPublic) ){
+    makeToReconnectButton(document.getElementById('connect'));
+} else {
+    makeToConnectButton(document.getElementById('connect'));
+}
 
 document.getElementById('connect').addEventListener('click', function () {
-    let wsProtocol = document.getElementById('scheme').value;
-    let wsPath = document.getElementById('path').value;  //NOTE: URLからスキーマを除いた部分の名称が分からなかった
-
-    if (wsPath == '') {
-        wsPath = document.getElementById('path').placeholder;
+    if(wsUrl == null){
+        errorPrintln('[Parameter] 無効なURLパラメータです。');
+        return;
     }
-    wsUrl = wsProtocol + wsPath;
 
     if (isAvailableWebsocket) {
-        ws.send("Bye");
-        ws.close();
-        logPrintln("[WebSocket] 接続終了");
+        isAvailableWebsocket = false;
+        let msg = {
+            "header":{
+                "cmd": "exit"
+            },
+            "contents": null
+        }
+        ws.send(JSON.stringify(msg));
+        localStorage.removeItem(relayIdPublic);
+        makeToConnectButton(document.getElementById('connect'));
+        return;
     }
 
     logPrintln("[WebSocket] Connecting to: " + wsUrl);
@@ -25,17 +46,64 @@ document.getElementById('connect').addEventListener('click', function () {
         ws = new WebSocket(wsUrl);
     } catch (e) {
         errorPrintln("[WebSocker] 接続に失敗しました");
+        return;
     }
 
     ws.onopen = function (e) {
         logPrintln("[WebSocket] 接続に成功しました");
         isAvailableWebsocket = true;
-        ws.send("Hello");
+        makeToDisconnectButton(document.getElementById('connect'));
+        let clientId = localStorage.getItem(relayIdPublic);
+        let msg = {
+            "header":{
+                "cmd": "connect",
+                "client_id": clientId
+            },
+            "contents": null
+        };
+        if ( clientId ) {
+            // 再接続
+            msg['header']['cmd'] = 'reconnect';
+            logPrintln('[WebSocket] reconnect');
+            logPrintln(JSON.stringify(msg));
+        }
+        ws.send(JSON.stringify(msg));
+    }
+
+    ws.onmessage = function(e) {
+        let msg = JSON.parse(e.data);
+        if ( msg.errors ){
+            errorPrintln('[WebSocket][Message] ' + String(e.data));
+        } else {
+            logPrintln('[WebSocket][Message] ' + String(e.data));
+        }
+        if ( msg.header.client_id ){
+            localStorage.setItem(relayIdPublic, msg.header.client_id);
+            logPrintln('[WebSocket] Save new client id: ' + msg.header.client_id);
+        }
     }
 
     ws.onerror = function (error) {
         errorPrintln("[WebSocker] エラーが発生しました");
         isAvailableWebsocket = false;
+        if ( localStorage.getItem(relayIdPublic) ){
+            makeToReconnectButton(document.getElementById('connect'));
+        } else {
+            makeToConnectButton(document.getElementById('connect'));
+        }
+    }
+
+    ws.onclose = function (e) {
+        logPrintln("[WebSocket] 接続が切断されました");
+        logPrintln("[WebSocket] Code: " + String(e.code));
+        logPrintln("[WebSocket] Reason: " + e.reason);
+        isAvailableWebsocket = false;
+        
+        if ( localStorage.getItem(relayIdPublic) ){
+            makeToReconnectButton(document.getElementById('connect'));
+        } else {
+            makeToConnectButton(document.getElementById('connect'));
+        }
     }
 })
 
@@ -69,10 +137,21 @@ if (!isGyro) {
             alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
             beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
             gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
-            msg = "a: " + alpha + ", b: " + beta + ", g: " + gamma;
-            logPrintln(msg);
+            logPrintln("a: " + alpha + ", b: " + beta + ", g: " + gamma);
+            msg = {
+                'header': {
+                    'cmd': 'relay'
+                },
+                'contents': {
+                    'gyro':{
+                        alpha,
+                        beta,
+                        gamma
+                    }
+                }
+            }
             if (isAvailableWebsocket) {
-                ws.send(msg);
+                ws.send(JSON.stringify(msg));
             }
         });
     }
@@ -133,6 +212,27 @@ function gyroIsNotAllowed() {
     errorPrintln(msg);
 }
 
+function makeToConnectButton(buttonElement){
+    buttonElement.innerText = '接続';
+    buttonElement.classList.add('btn-primary');
+    buttonElement.classList.remove('btn-danger');
+    buttonElement.classList.remove('btn-success');
+}
+
+function makeToDisconnectButton(buttonElement){
+    buttonElement.innerText = '切断';
+    buttonElement.classList.add('btn-danger');
+    buttonElement.classList.remove('btn-primary');
+    buttonElement.classList.remove('btn-success');
+}
+
+function makeToReconnectButton(buttonElement){
+    buttonElement.innerText = '再接続';
+    buttonElement.classList.add('btn-success');
+    buttonElement.classList.remove('btn-primary');
+    buttonElement.classList.remove('btn-danger');
+}
+
 /**
  * エラーメッセージをhtmlのコンソールエレメントの先頭（1行目）に表示する
  * "error"クラスを適用
@@ -164,6 +264,25 @@ function logPrintln(msg) {
  * @param {htmlのエレメント} element 
  */
 function htmlConsolePrintln(element) {
+    if (!element) return;
     const consoleElement = document.getElementById("console");
-    consoleElement.insertBefore(element, consoleElement.firstChild);
+    consoleElement.insertAdjacentElement('beforeend', element);
+    let bottom = consoleElement.scrollHeight - consoleElement.clientHeight;
+    consoleElement.scroll(0, bottom);
 }
+
+
+/**
+ * Get the URL parameter value
+ * Ref: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+ * @param  name {string} パラメータのキー文字列
+ * @return  url {url} 対象のURL文字列（任意）
+ */
+function getParam(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
