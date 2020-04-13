@@ -138,6 +138,9 @@ if (!isGyro) {
             if (performance.now() - gyroBeforeUpdate < gyroUpdateIntervalSec * 1000 / sendPerSecond) {
                 return;
             }
+            if (!isAvailableWebsocket) {
+                return;
+            }
             gyroBeforeUpdate = performance.now();
             alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
             beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
