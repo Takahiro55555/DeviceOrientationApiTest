@@ -8,11 +8,11 @@ let wsUrl = null;
 let relayIdPublic = null;
 let sendPerSecond = 1;
 
-if ( getParam("sps") != null) {
+if (getParam("sps") != null) {
     sendPerSecond = getParam("sps");
 }
 
-if ( getParam('protocol') != null && getParam('relayId') != null) {
+if (getParam('protocol') != null && getParam('relayId') != null) {
     wsUrl = getParam('protocol') + '://controller.moyashi.dev/ws/v1/relays/' + getParam('relayId');
     relayIdPublic = getParam('relayId').match(/^[0-9a-zA-Z]+/)[0];
     document.getElementById('ws-url').innerText = wsUrl;
@@ -20,14 +20,14 @@ if ( getParam('protocol') != null && getParam('relayId') != null) {
     document.getElementById('ws-url').innerText = 'Invalid URL Parameter!!!';
 }
 
-if ( localStorage.getItem(relayIdPublic) ){
+if (localStorage.getItem(relayIdPublic)) {
     makeToReconnectButton(document.getElementById('connect'));
 } else {
     makeToConnectButton(document.getElementById('connect'));
 }
 
 document.getElementById('connect').addEventListener('click', function () {
-    if(wsUrl == null){
+    if (wsUrl == null) {
         errorPrintln('[Parameter] 無効なURLパラメータです。');
         return;
     }
@@ -35,7 +35,7 @@ document.getElementById('connect').addEventListener('click', function () {
     if (isAvailableWebsocket) {
         isAvailableWebsocket = false;
         let msg = {
-            "header":{
+            "header": {
                 "cmd": "exit"
             },
             "contents": null
@@ -60,13 +60,13 @@ document.getElementById('connect').addEventListener('click', function () {
         makeToDisconnectButton(document.getElementById('connect'));
         let clientId = localStorage.getItem(relayIdPublic);
         let msg = {
-            "header":{
+            "header": {
                 "cmd": "connect",
                 "client_id": clientId
             },
             "contents": null
         };
-        if ( clientId ) {
+        if (clientId) {
             // 再接続
             msg['header']['cmd'] = 'reconnect';
             logPrintln('[WebSocket] reconnect');
@@ -75,14 +75,14 @@ document.getElementById('connect').addEventListener('click', function () {
         ws.send(JSON.stringify(msg));
     }
 
-    ws.onmessage = function(e) {
+    ws.onmessage = function (e) {
         let msg = JSON.parse(e.data);
-        if ( msg.errors ){
+        if (msg.errors) {
             errorPrintln('[WebSocket][Message] ' + String(e.data));
         } else {
             logPrintln('[WebSocket][Message] ' + String(e.data));
         }
-        if ( msg.header.client_id ){
+        if (msg.header.client_id) {
             localStorage.setItem(relayIdPublic, msg.header.client_id);
             logPrintln('[WebSocket] Save new client id: ' + msg.header.client_id);
         }
@@ -91,7 +91,7 @@ document.getElementById('connect').addEventListener('click', function () {
     ws.onerror = function (error) {
         errorPrintln("[WebSocker] エラーが発生しました");
         isAvailableWebsocket = false;
-        if ( localStorage.getItem(relayIdPublic) ){
+        if (localStorage.getItem(relayIdPublic)) {
             makeToReconnectButton(document.getElementById('connect'));
         } else {
             makeToConnectButton(document.getElementById('connect'));
@@ -103,8 +103,8 @@ document.getElementById('connect').addEventListener('click', function () {
         logPrintln("[WebSocket] Code: " + String(e.code));
         logPrintln("[WebSocket] Reason: " + e.reason);
         isAvailableWebsocket = false;
-        
-        if ( localStorage.getItem(relayIdPublic) ){
+
+        if (localStorage.getItem(relayIdPublic)) {
             makeToReconnectButton(document.getElementById('connect'));
         } else {
             makeToConnectButton(document.getElementById('connect'));
@@ -151,7 +151,7 @@ if (!isGyro) {
                     'cmd': 'relay'
                 },
                 'contents': {
-                    'gyro':{
+                    'gyro': {
                         alpha,
                         beta,
                         gamma
@@ -220,21 +220,21 @@ function gyroIsNotAllowed() {
     errorPrintln(msg);
 }
 
-function makeToConnectButton(buttonElement){
+function makeToConnectButton(buttonElement) {
     buttonElement.innerText = '接続';
     buttonElement.classList.add('btn-primary');
     buttonElement.classList.remove('btn-danger');
     buttonElement.classList.remove('btn-success');
 }
 
-function makeToDisconnectButton(buttonElement){
+function makeToDisconnectButton(buttonElement) {
     buttonElement.innerText = '切断';
     buttonElement.classList.add('btn-danger');
     buttonElement.classList.remove('btn-primary');
     buttonElement.classList.remove('btn-success');
 }
 
-function makeToReconnectButton(buttonElement){
+function makeToReconnectButton(buttonElement) {
     buttonElement.innerText = '再接続';
     buttonElement.classList.add('btn-success');
     buttonElement.classList.remove('btn-primary');
