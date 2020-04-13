@@ -6,12 +6,17 @@ let isAvailableWebsocket = false;
 let ws;
 let wsUrl = null;
 let relayIdPublic = null;
+let sendPerSecond = 1;
 
-if( getParam('protocol') != null && getParam('relayId') != null) {
+if ( getParam("sps") != null) {
+    sendPerSecond = getParam("sps");
+}
+
+if ( getParam('protocol') != null && getParam('relayId') != null) {
     wsUrl = getParam('protocol') + '://controller.moyashi.dev/ws/v1/relays/' + getParam('relayId');
     relayIdPublic = getParam('relayId').match(/^[0-9a-zA-Z]+/)[0];
     document.getElementById('ws-url').innerText = wsUrl;
-}else{
+} else {
     document.getElementById('ws-url').innerText = 'Invalid URL Parameter!!!';
 }
 
@@ -130,7 +135,7 @@ if (!isGyro) {
         //参考URL: https://kkblab.com/make/javascript/gyro.html
         // ジャイロセンサの値が変化したら実行される deviceorientation イベント
         window.addEventListener("deviceorientation", (dat) => {
-            if (performance.now() - gyroBeforeUpdate < gyroUpdateIntervalSec * 1000) {
+            if (performance.now() - gyroBeforeUpdate < gyroUpdateIntervalSec * 1000 / sendPerSecond) {
                 return;
             }
             gyroBeforeUpdate = performance.now();
