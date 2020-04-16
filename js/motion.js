@@ -142,9 +142,9 @@ if (!isGyro) {
                 return;
             }
             gyroBeforeUpdate = performance.now();
-            alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
-            beta = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
-            gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
+            alpha = (dat.alpha * 100) / 100;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
+            beta = (dat.beta * 100) / 100;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
+            gamma = (dat.gamma * 100) / 100;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
             logPrintln("a: " + alpha + ", b: " + beta + ", g: " + gamma);
             msg = {
                 'header': {
