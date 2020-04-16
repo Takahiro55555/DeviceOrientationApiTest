@@ -2,6 +2,8 @@
     height: 90%;
     white-space: normal;
     overflow: scroll;
+    font-family:monospace;
+    font-weight: bold;
 }
 
 .log{
