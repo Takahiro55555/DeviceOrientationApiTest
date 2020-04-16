@@ -298,8 +298,7 @@ function getParam(name, url) {
 
 function zeroPadding(num, length){
     if(num < 0){
-        return '-' + ('00000000000000000' + -1*num).slice(1-length);
-    }else{
-        return ('00000000000000000' + num).slice(length);
+        return '-' + ('00000000000000000' + String(-1*num)).slice(1-length);
     }
+    return '0' + ('00000000000000000' + String(num)).slice(1-length);
 }
