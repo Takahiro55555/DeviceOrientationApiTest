@@ -142,10 +142,10 @@ if (!isGyro) {
                 return;
             }
             gyroBeforeUpdate = performance.now();
-            alpha = zeroPadding(Math.floor(dat.alpha * 100) / 100, 7);  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
-            beta = zeroPadding(Math.floor(dat.beta * 100) / 100, 7);   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
-            gamma = zeroPadding(Math.floor(dat.gamma * 100) / 100, 7);  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
-            logPrintln("a: " + alpha + ", b: " + beta + ", g: " + gamma);
+            alpha = Math.floor(dat.alpha * 100) / 100;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
+            beta = Math.floor(dat.beta * 100) / 100;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
+            gamma = Math.floor(dat.gamma * 100) / 100;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
+            logPrintln("a: " + zeroPadding(alpha, 7) + ", b: " + zeroPadding(beta, 7) + ", g: " + zeroPadding(gamma, 7));
             msg = {
                 'header': {
                     'cmd': 'relay'
