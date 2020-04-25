@@ -1,0 +1,91 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>DeviceOrientationApiTest</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body id="body" class="container">
+  <div class="row">
+    <div class="col-12 mt-3">
+      <h1>TestPage</h1>
+    </div>
+    <div class="col-12 mt-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="cart-title">WebSocket 接続先</h5>
+          <div id="ws-url"></div>
+          <button id="connect" class="btn btn-primary btn-block mt-4">接続</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-3" style="height: 20rem;">
+      <div class="card" style="height: 100%;">
+        <div class="card-body" style="height: 100%;">
+          <h5 class="cart-title">Console</h5>
+          <div id="console" class="console"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p>ルームID
+      <input id="roomIdInput" type="text" value=""></input>
+      </p>
+      <p>クライアントID
+      <input id="clientIdInput" disabled type="text" value=""></input>
+      </p>
+      <p> 映像コーデック
+      <select id="video-codec" onChange="onChangeVideoCodec();">
+        <option value="none">none</option>
+        <option value="H264">H264</option>
+        <option value="VP8">VP8</option>
+        <option value="VP9">VP9</option>
+      </select>
+      （Google Chrome、Microsoft Edge でのみで動作します）
+      </p>
+      <button onclick="startConn();">接続</button>
+      <button onclick="disconnect();">切断</button>
+    </div>
+    <div style="float:left;">
+      <video id="remote-video" autoplay playsinline controls style="width: 400px; height: 300px; border: 1px solid black;"></video>
+    </div>
+  </div>
+</body>
+<script src="js/motion.js?p=(new Date()).getTime()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@open-ayame/ayame-web-sdk@2020.2.1/dist/ayame.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.7.0/qs.min.js"></script>
+<script src="./js/video.js"></script>
+<script type="text/javascript">
+  const options = Ayame.defaultOptions;
+  options.clientId = clientId ? clientId : options.clientId;
+  if (signalingKey) {
+    options.signalingKey = signalingKey;
+  }
+  options.video.direction = 'recvonly';
+  options.audio.direction = 'recvonly';
+  let conn;
+  const disconnect = () => {
+    if (conn) {
+      conn.disconnect();
+    }
+  }
+  const startConn = async () => {
+    options.video.codec = videoCodec;
+    conn = Ayame.connection(signalingUrl, roomId, options, true);
+    await conn.connect(null);
+    conn.on('open', ({authzMetadata}) => console.log(authzMetadata));
+    conn.on('disconnect', (e) => console.log(e));
+    conn.on('addstream', (e) => {
+      document.querySelector('#remote-video').srcObject = e.stream;
+    });
+  };
+  document.querySelector("#roomIdInput").value = roomId;
+  document.querySelector("#clientIdInput").value = options.clientId;
+</script>
+</html>
