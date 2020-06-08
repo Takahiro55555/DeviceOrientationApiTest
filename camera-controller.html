@@ -54,7 +54,7 @@
           （Google Chrome、Microsoft Edge でのみで動作します）
           </p>
           <button id="connect-video" class="btn btn-primary btn-block mt-4">接続</button>
-          <video id="remote-video" autoplay playsinline controls style="width: 100%; border: 1px solid black; margin-top: 2rem;"></video>
+          <video id="remote-video" autoplay playsinline controls style="width: 100%; max-height: 100%; border: 1px solid black; margin-top: 2rem;"></video>
         </div>
       </div>
     </div>
@@ -64,7 +64,7 @@
         <div class="card-body" style="height: 100%;">
           <h5 class="cart-title">QR Code</h5>
           <p>スマートフォンなどから接続する際は、こちらのQRコードを読み込んでください。</p>
-          <canvas id="qr"></canvas>
+          <canvas id="qr" style="max-width: 100%; max-height: 100%;"></canvas>
         </div>
       </div>
     </div>
@@ -137,8 +137,8 @@
   function writeQr(canvas, data){
     return new Promise((res, rej)=>{
         QRCode.toCanvas(canvas, data, {
-            margin: 4,
-            scale: 5
+            margin: 2,
+            scale: 3.5
         }, (err, tg) => !err ? res(tg) : rej(err));
     });
   }
