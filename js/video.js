@@ -1,5 +1,5 @@
 const signalingUrl = 'wss://ayame.moyashi.dev/signaling';
-let roomId = 'ayame-sdk-test';
+let roomId = getParam('relayId');  // getParam関数は motion.js にある
 let clientId = null;
 let videoCodec = null;
 let audioCodec = null;

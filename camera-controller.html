@@ -33,35 +33,53 @@
         </div>
       </div>
     </div>
-    <div>
-      <p>ルームID
-      <input id="roomIdInput" type="text" value=""></input>
-      </p>
-      <p>クライアントID
-      <input id="clientIdInput" disabled type="text" value=""></input>
-      </p>
-      <p> 映像コーデック
-      <select id="video-codec" onChange="onChangeVideoCodec();">
-        <option value="none">none</option>
-        <option value="H264">H264</option>
-        <option value="VP8">VP8</option>
-        <option value="VP9">VP9</option>
-      </select>
-      （Google Chrome、Microsoft Edge でのみで動作します）
-      </p>
-      <button onclick="startConn();">接続</button>
-      <button onclick="disconnect();">切断</button>
+
+    <div class="col-12 mt-3" style="">
+      <div class="card" style="height: 100%;">
+        <div class="card-body" style="height: 100%;">
+          <h5 class="cart-title">Video</h5>
+          <p>ルームID
+          <input id="roomIdInput" type="text" value=""></input>
+          </p>
+          <p>クライアントID
+          <input id="clientIdInput" disabled type="text" value=""></input>
+          </p>
+          <p> 映像コーデック
+          <select id="video-codec" onChange="onChangeVideoCodec();">
+            <option value="none">none</option>
+            <option value="H264">H264</option>
+            <option value="VP8">VP8</option>
+            <option value="VP9">VP9</option>
+          </select>
+          （Google Chrome、Microsoft Edge でのみで動作します）
+          </p>
+          <button id="connect-video" class="btn btn-primary btn-block mt-4">接続</button>
+          <video id="remote-video" autoplay playsinline controls style="width: 100%; border: 1px solid black; margin-top: 2rem;"></video>
+        </div>
+      </div>
     </div>
-    <div style="float:left;">
-      <video id="remote-video" autoplay playsinline controls style="width: 400px; height: 300px; border: 1px solid black;"></video>
+
+    <div class="col-12 mt-3" style="padding-bottom: 5rem;">
+      <div class="card" style="height: 100%;">
+        <div class="card-body" style="height: 100%;">
+          <h5 class="cart-title">QR Code</h5>
+          <p>スマートフォンなどから接続する際は、こちらのQRコードを読み込んでください。</p>
+          <canvas id="qr"></canvas>
+        </div>
+      </div>
     </div>
+
+
   </div>
 </body>
 <script src="js/motion.js?p=(new Date()).getTime()"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@latest/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@open-ayame/ayame-web-sdk@2020.2.1/dist/ayame.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.7.0/qs.min.js"></script>
 <script src="./js/video.js"></script>
 <script type="text/javascript">
+  const videoConnectButton = document.getElementById("connect-video");
+  
   const options = Ayame.defaultOptions;
   options.clientId = clientId ? clientId : options.clientId;
   if (signalingKey) {
@@ -69,23 +87,62 @@
   }
   options.video.direction = 'recvonly';
   options.audio.direction = 'recvonly';
+  
+  let isConnectiong = false;
+  videoConnectButton.onclick = () => {
+    if (isConnectiong) {
+      disconnect();
+    } else {
+      startConn();
+    }
+  }
+
   let conn;
   const disconnect = () => {
     if (conn) {
       conn.disconnect();
     }
+    makeToConnectButton(videoConnectButton);
+    isConnectiong = false;
+    logPrintln("makeToConnectButton");
   }
   const startConn = async () => {
+    makeToDisconnectButton(videoConnectButton);
+    isConnectiong = true;
     options.video.codec = videoCodec;
     conn = Ayame.connection(signalingUrl, roomId, options, true);
     await conn.connect(null);
-    conn.on('open', ({authzMetadata}) => console.log(authzMetadata));
-    conn.on('disconnect', (e) => console.log(e));
+    conn.on('open', ({authzMetadata}) => {
+      console.log(authzMetadata);
+      makeToDisconnectButton(videoConnectButton);
+      isConnectiong = true;
+      logPrintln("makeToDisconnectButton");
+    });
+    conn.on('disconnect', (e) => {
+      console.log(e);
+      makeToConnectButton(videoConnectButton);
+      isConnectiong = false;
+      logPrintln("makeToConnectButton");
+    });
     conn.on('addstream', (e) => {
       document.querySelector('#remote-video').srcObject = e.stream;
     });
   };
   document.querySelector("#roomIdInput").value = roomId;
   document.querySelector("#clientIdInput").value = options.clientId;
+
+  /*
+   * 参考：https://qiita.com/dojyorin/items/78c22be5411ad68cdff9
+  */
+  function writeQr(canvas, data){
+    return new Promise((res, rej)=>{
+        QRCode.toCanvas(canvas, data, {
+            margin: 4,
+            scale: 5
+        }, (err, tg) => !err ? res(tg) : rej(err));
+    });
+  }
+
+  writeQr(document.getElementById("qr"), window.location.href);
 </script>
 </html>
