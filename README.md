@@ -6,4 +6,5 @@
 具体的な目標は以下の通りです。
 - [x] [スマートフォンのジャイロセンサ値をRaspberryPiに送信する](https://takahiro55555.github.io/DeviceOrientationApiTest/index.html)
 - [X] [RaspberryPiなどから映像リアルタイムでを受信する](https://takahiro55555.github.io/DeviceOrientationApiTest/camera-controller.html)
-- [ ] スマートフォンのジャイロセンサの値を用いてRaspberryPiのカメラを操作する
+- [X] スマートフォンのジャイロセンサの値を用いてRaspberryPiのカメラを操作する
+- [ ] AWS IoT を使う
