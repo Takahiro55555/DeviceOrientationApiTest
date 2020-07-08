@@ -242,45 +242,6 @@ function makeToReconnectButton(buttonElement) {
 }
 
 /**
- * エラーメッセージをhtmlのコンソールエレメントの先頭（1行目）に表示する
- * "error"クラスを適用
- * @param {表示したいメッセージ} msg 
- */
-function errorPrintln(msg) {
-    const newLogElement = document.createElement("div");
-    newLogElement.textContent = "[Error] " + msg;
-    newLogElement.className = "error";
-    htmlConsolePrintln(newLogElement);
-    console.log(msg);
-}
-
-/**
- * ログメッセージをhtmlのコンソールエレメントの先頭（1行目）に表示する
- * "log"クラスを適用
- * @param {表示したいメッセージ} msg 
- */
-function logPrintln(msg) {
-    const newLogElement = document.createElement("div");
-    newLogElement.textContent = "[Log] " + msg;
-    newLogElement.className = "log";
-    htmlConsolePrintln(newLogElement);
-    console.log(msg);
-}
-
-/**
- * htmlのコンソールエレメントの先頭（1行目）に当該エレメントを追記する
- * @param {htmlのエレメント} element 
- */
-function htmlConsolePrintln(element) {
-    if (!element) return;
-    const consoleElement = document.getElementById("console");
-    consoleElement.insertAdjacentElement('beforeend', element);
-    let bottom = consoleElement.scrollHeight - consoleElement.clientHeight;
-    consoleElement.scroll(0, bottom);
-}
-
-
-/**
  * Get the URL parameter value
  * Ref: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
  * @param  name {string} パラメータのキー文字列
@@ -294,11 +255,4 @@ function getParam(name, url) {
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-function zeroPadding(num, length){
-    if(num < 0){
-        return '-' + ('00000000000000000' + String(-1*num)).slice(1-length);
-    }
-    return '0' + ('00000000000000000' + String(num)).slice(1-length);
 }
